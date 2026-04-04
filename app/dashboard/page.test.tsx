@@ -5,6 +5,13 @@ jest.mock("@/features/tutoring/ai/provider", () => ({
   getTutoringAiMode: jest.fn(() => "mock"),
 }));
 
+jest.mock("@/features/tutoring/data/server", () => ({
+  fetchAvailableTopics: jest.fn(async () => [
+    { id: "1", slug: "revenue", title: "Revenue Fundamentals" },
+    { id: "2", slug: "gross-profit", title: "Gross Profit" },
+  ]),
+}));
+
 jest.mock("@/features/tutoring/components/protected-tutoring-page", () => ({
   ProtectedTutoringPage: jest.fn(({ children }) => <div data-testid="tutoring-shell">{children}</div>),
 }));

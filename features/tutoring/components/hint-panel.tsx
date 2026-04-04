@@ -1,10 +1,16 @@
-export function HintPanel({ hint }: { hint: string }) {
+export function HintPanel({
+  hint,
+  hintLevel,
+}: {
+  hint: string;
+  hintLevel?: number;
+}) {
   return (
-    <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <summary className="cursor-pointer list-none text-sm font-medium text-slate-900">
-        Need a hint?
-      </summary>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{hint}</p>
-    </details>
+    <section className="rounded-xl border border-sky-200 bg-sky-50/70 p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
+        Hint{typeof hintLevel === "number" && hintLevel > 0 ? ` ${hintLevel}` : ""}
+      </p>
+      <p className="mt-1 text-sm leading-6 text-slate-700">{hint}</p>
+    </section>
   );
 }

@@ -3,28 +3,38 @@ import {
   FeedbackResponse,
   TutoringAiProvider,
 } from "@/features/tutoring/ai/types";
+import { MockTutoringAiProvider } from "@/features/tutoring/ai/mock-provider";
 
 /**
  * Placeholder provider for real AI mode.
- * This keeps the architecture ready for an OpenAI call without requiring it yet.
+ * For now it mirrors the mock structure with "real" mode metadata,
+ * which keeps the app demo-ready while API integration is pending.
  */
 export class OpenAiTutoringProvider implements TutoringAiProvider {
   constructor(private readonly apiKey: string) {}
 
   async getFeedback(request: FeedbackRequest): Promise<FeedbackResponse> {
-    const keySuffix = this.apiKey ? "configured" : "missing";
+    const fallback = new MockTutoringAiProvider();
+    const mockFeedback = await fallback.getFeedback(request);
+
+    if (!this.apiKey.trim()) {
+      return {
+        ...mockFeedback,
+        mode: "mock",
+        summary:
+          "OPENAI_API_KEY is missing, so mock tutoring feedback was used for a reliable demo flow.",
+      };
+    }
 
     return {
+      ...mockFeedback,
       mode: "real",
-      score: 0.6,
-      numericCorrect: false,
-      summary: `Real AI mode is scaffolded (${keySuffix} API key) and ready for endpoint wiring.`,
-      strengths: ["Architecture is set up for swapping providers by environment."],
+      summary:
+        "Real AI mode is scaffolded. Plug your OpenAI client call into this provider to replace mock-generated coaching text.",
       improvements: [
-        "Wire this provider to an OpenAI client call and map model output to the FeedbackResponse type.",
+        ...mockFeedback.improvements,
+        "Connect this provider to OpenAI and map model output to the existing FeedbackResponse schema.",
       ],
-      hint: request.hint,
-      recommendedNextStep: "repeat",
     };
   }
 }

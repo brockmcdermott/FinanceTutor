@@ -10,7 +10,7 @@
     "db:migrate:generate": "supabase migration new",
     "db:migrate:diff": "supabase db diff -f ",
     "db:migrate:run": "supabase db push",
-    "db:reset": "supabase db reset --force",
+    "db:reset": "supabase db reset --local --yes",
     "db:migrate:up": "supabase migration up",
     "db:migrate:down": "supabase migration down",
     "supabase:start": "supabase start",

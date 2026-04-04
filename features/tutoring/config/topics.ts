@@ -84,7 +84,7 @@ export const financeTopics: FinanceTopic[] = [
     ],
   },
   {
-    id: "fixed-vs-variable",
+    id: "fixed-vs-variable-expenses",
     title: "Fixed vs Variable Expenses",
     summary: "Classify costs to understand operating leverage and sensitivity to sales.",
     order: 4,
@@ -92,7 +92,7 @@ export const financeTopics: FinanceTopic[] = [
     scenarios: [
       {
         id: "expense-mix-food-truck",
-        topicId: "fixed-vs-variable",
+        topicId: "fixed-vs-variable-expenses",
         title: "Food Truck Cost Mix",
         context:
           "A food truck spends $4,200 on monthly permits + rent, $1,600 on staff base wages, and $7,800 on ingredients that change with sales.",

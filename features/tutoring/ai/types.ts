@@ -1,14 +1,39 @@
 export type TutoringAiMode = "mock" | "real";
 
+export interface EvaluatedQuestionForAi {
+  questionId: string;
+  prompt: string;
+  responseFormat: "numeric" | "short_text" | "mixed";
+  numericRequired: boolean;
+  numericCorrect: boolean | null;
+  numericDelta: number | null;
+  explanationRequired: boolean;
+  explanationScore: number;
+  answerText: string;
+  misconceptionTags: string[];
+  hintLevelUsed: number;
+  score: number;
+}
+
 export interface FeedbackRequest {
-  topicId: string;
+  topicSlug: string;
+  topicTitle: string;
   scenarioId: string;
-  scenarioPrompt: string;
-  expectedNumericAnswer?: number;
-  acceptedNumericTolerance?: number;
+  scenarioTitle: string;
+  scenarioContext: string;
+  evaluatedQuestions: EvaluatedQuestionForAi[];
+}
+
+export interface QuestionFeedbackResponse {
+  questionId: string;
+  prompt: string;
+  isCorrect: boolean;
+  whatWasCorrect: string;
+  whatWasWrong: string;
+  whyItWasWrong: string;
   hint: string;
-  numericAnswer?: number;
-  writtenAnswer: string;
+  followUpQuestion: string;
+  misconceptionTags: string[];
 }
 
 export interface FeedbackResponse {
@@ -19,6 +44,9 @@ export interface FeedbackResponse {
   strengths: string[];
   improvements: string[];
   hint: string;
+  followUpQuestion: string;
+  misconceptionTags: string[];
+  questionFeedback: QuestionFeedbackResponse[];
   recommendedNextStep: "advance" | "repeat" | "review";
 }
 

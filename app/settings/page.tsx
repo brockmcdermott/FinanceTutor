@@ -1,10 +1,9 @@
-import { getTutoringAiMode } from "@/features/tutoring/ai/provider";
+import { getTutoringAiRuntimeStatus } from "@/features/tutoring/ai/provider";
 import { ProtectedTutoringPage } from "@/features/tutoring/components/protected-tutoring-page";
 import { ProgressSummaryCard } from "@/features/tutoring/components/progress-summary-card";
 
 export default async function SettingsPage() {
-  const aiMode = getTutoringAiMode();
-  const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY);
+  const aiStatus = getTutoringAiRuntimeStatus();
 
   return ProtectedTutoringPage({
     currentPath: "/settings",
@@ -13,20 +12,32 @@ export default async function SettingsPage() {
       "Configure tutoring behavior and environment-backed AI settings for mock or real provider modes.",
     children: (
       <>
-        <section className="grid gap-3 sm:grid-cols-2">
+        <section className="grid gap-3 sm:grid-cols-3">
           <ProgressSummaryCard
             label="AI Provider Mode"
-            value={aiMode === "mock" ? "mock" : "real"}
-            caption="Controlled by TUTORING_AI_MODE"
+            value={aiStatus.mode === "mock" ? "mock" : "real"}
+            caption="Controlled by MOCK_AI and OPENAI_API_KEY"
             tone="focus"
           />
           <ProgressSummaryCard
             label="OpenAI Key"
-            value={hasOpenAiKey ? "Present" : "Not set"}
+            value={aiStatus.hasOpenAiKey ? "Present" : "Not set"}
             caption="Optional until real mode wiring is complete"
-            tone={hasOpenAiKey ? "positive" : "neutral"}
+            tone={aiStatus.hasOpenAiKey ? "positive" : "neutral"}
+          />
+          <ProgressSummaryCard
+            label="Mock AI Flag"
+            value={aiStatus.mockEnabled ? "Enabled" : "Disabled"}
+            caption="Use MOCK_AI=true for guaranteed demo behavior"
           />
         </section>
+
+        {aiStatus.fallbackReason && (
+          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+            <p className="text-sm font-semibold text-amber-900">Runtime fallback</p>
+            <p className="mt-1 text-sm text-amber-800">{aiStatus.fallbackReason}</p>
+          </section>
+        )}
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-lg font-semibold text-slate-900">Learning preferences</h2>

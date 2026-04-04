@@ -3,9 +3,10 @@ import { getTutoringAiMode } from "@/features/tutoring/ai/provider";
 import { ProtectedTutoringPage } from "@/features/tutoring/components/protected-tutoring-page";
 import { ProgressSummaryCard } from "@/features/tutoring/components/progress-summary-card";
 import { TopicBadge } from "@/features/tutoring/components/topic-badge";
-import { financeTopics } from "@/features/tutoring/config/topics";
+import { fetchAvailableTopics } from "@/features/tutoring/data/server";
 
 export default async function DashboardPage() {
+  const topics = await fetchAvailableTopics();
   const aiMode = getTutoringAiMode();
 
   return ProtectedTutoringPage({
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
         <section className="grid gap-3 sm:grid-cols-3">
           <ProgressSummaryCard
             label="Topics Available"
-            value={String(financeTopics.length)}
+            value={String(topics.length)}
             caption="Config-driven and easy to extend"
             tone="focus"
           />
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {financeTopics.map((topic) => (
+            {topics.map((topic) => (
               <TopicBadge key={topic.id}>{topic.title}</TopicBadge>
             ))}
           </div>
