@@ -1,0 +1,66 @@
+---
+description: Keep Supabase out of UI; use hooks (client) and server functions (server)
+globs: "**/*.tsx,app/**/route.ts"
+alwaysApply: false
+---
+
+# Supabase and Data Layer
+
+Supabase (`createClient` from `@/lib/supabase/client` or `server`) must **not** be imported in components or route handlers for auth/data logic.
+
+## Client (React components)
+
+- **Use custom hooks** in `hooks/` for any Supabase calls (auth, profile, storage).
+- Components import hooks only; they hold form/UI state and call hook functions.
+### Auth and data hooks (`hooks/`)
+
+| Hook | Use for | Returns / API |
+|------|---------|----------------|
+| `useAuth` | Current user, loading | `{ user, loading }` |
+| `useLogin` | Sign in | `login({ email, password })` → `{ login, isLoading, error }` |
+| `useSignUp` | Sign up | `signUp({ email, password, repeatPassword, firstName?, lastName? })` → `{ signUp, isLoading, error }` |
+| `useUpdatePassword` | Set new password | `updatePassword(password)` → `{ updatePassword, isLoading, error }` |
+| `useForgotPassword` | Reset link email | `sendResetEmail(email)` → `{ sendResetEmail, isLoading, error, success }` |
+| `useLogout` | Sign out | `logout()` → `{ logout }` |
+| `useProfile` | Current user profile | `{ profile, loading, error }` (profile_picture_url, first_name, last_name, created_at) |
+| `useProfileImageUpload` | Upload avatar | `upload(file)` → `{ upload, uploading, error }` |
+
+Components keep form state locally and call these; e.g. `await login({ email, password })` in submit handler.
+
+```tsx
+// ❌ BAD – Supabase in component
+import { createClient } from "@/lib/supabase/client";
+const supabase = createClient();
+await supabase.auth.signInWithPassword({ email, password });
+
+// ✅ GOOD – Hook in component
+const { login, isLoading, error } = useLogin();
+await login({ email, password });
+```
+
+## Server (route handlers, server components)
+
+- **Use server functions** in `lib/auth.ts` (e.g. `requireAuth`, `verifyEmailOtp`) for auth logic.
+- Route handlers and server code call these functions; they do **not** call `createClient()` for that logic.
+- Validation (e.g. OTP type) lives inside the server function, not in the route.
+
+### Server auth functions (`lib/auth.ts`)
+
+| Function | Use for | Signature / return |
+|----------|---------|---------------------|
+| `requireAuth()` | Protect server routes; redirect if not logged in | Returns user (claims); redirects to `/auth/login` if unauthenticated. Use in server components or before rendering protected content. |
+| `verifyEmailOtp(token_hash, type)` | Confirm email / magic link (e.g. auth confirm route) | Args: `token_hash`, `type` (string or null). Validates type; returns `{ error }` (null on success). Route passes raw query params; no Supabase in route. |
+
+```ts
+// ❌ BAD – Supabase in route
+const supabase = await createClient();
+await supabase.auth.verifyOtp({ type, token_hash });
+
+// ✅ GOOD – Server function in route
+const { error } = await verifyEmailOtp(token_hash, type);
+```
+
+## Where Supabase is allowed
+
+- `hooks/*.ts` – client-side Supabase (browser client).
+- `lib/auth.ts` and other lib modules – server-side Supabase (server client).
