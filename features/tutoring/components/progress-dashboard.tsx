@@ -48,6 +48,11 @@ export function ProgressDashboard({ dashboard }: { dashboard: LearnerProgressDas
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Topic mastery</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {dashboard.topicMastery.length === 0 && (
+            <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-600 sm:col-span-2">
+              No topic mastery rows yet. Complete one practice submission to populate this view.
+            </p>
+          )}
           {dashboard.topicMastery.map((topic) => {
             const progressPercent = Math.round(topic.masteryScore * 100);
 

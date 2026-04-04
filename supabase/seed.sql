@@ -789,3 +789,261 @@ begin
   end loop;
 end
 $$;
+
+-- Demo booster scenarios to keep the prototype feeling populated for live walkthroughs.
+
+with domain as (
+  select id
+  from public.subject_domains
+  where slug = 'business-finance'
+),
+topic as (
+  select t.id as topic_id
+  from public.tutoring_topics t
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'revenue'
+),
+scenario_upsert as (
+  insert into public.tutoring_scenarios (
+    topic_id,
+    slug,
+    title,
+    business_context,
+    difficulty_level,
+    display_order,
+    estimated_minutes,
+    is_active,
+    metadata
+  )
+  select
+    topic.topic_id,
+    'farmers-market-pop-up-week',
+    'Farmers Market Pop-Up Week',
+    'A bakery sold 410 boxed desserts at $11, 280 coffee bundles at $7, and 145 branded mugs at $16 during a pop-up week.',
+    'foundation',
+    4,
+    8,
+    true,
+    '{"seed_group":"demo_booster"}'::jsonb
+  from topic
+  on conflict (topic_id, slug)
+  do update
+  set
+    title = excluded.title,
+    business_context = excluded.business_context,
+    difficulty_level = excluded.difficulty_level,
+    display_order = excluded.display_order,
+    estimated_minutes = excluded.estimated_minutes,
+    is_active = excluded.is_active,
+    metadata = excluded.metadata
+  returning id
+),
+scenario_ref as (
+  select id as scenario_id from scenario_upsert
+  union all
+  select s.id
+  from public.tutoring_scenarios s
+  join public.tutoring_topics t on t.id = s.topic_id
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'revenue'
+    and s.slug = 'farmers-market-pop-up-week'
+  limit 1
+)
+insert into public.tutoring_scenario_skills (
+  scenario_id,
+  skill_id,
+  skill_weight
+)
+select
+  ref.scenario_id,
+  sk.id,
+  1.0
+from scenario_ref ref
+join domain d on true
+join public.tutoring_skills sk
+  on sk.subject_domain_id = d.id
+ and sk.slug in ('revenue-calculation', 'pricing-volume-analysis', 'assumption-analysis')
+on conflict (scenario_id, skill_id)
+do update
+set skill_weight = excluded.skill_weight;
+
+with domain as (
+  select id
+  from public.subject_domains
+  where slug = 'business-finance'
+),
+scenario_ref as (
+  select s.id as scenario_id
+  from public.tutoring_scenarios s
+  join public.tutoring_topics t on t.id = s.topic_id
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'revenue'
+    and s.slug = 'farmers-market-pop-up-week'
+  limit 1
+)
+insert into public.tutoring_scenario_questions (
+  scenario_id,
+  question_order,
+  prompt,
+  response_format,
+  numeric_answer,
+  numeric_tolerance,
+  unit,
+  explanation_prompt,
+  hint,
+  rubric,
+  metadata
+)
+select
+  ref.scenario_id,
+  1,
+  'What is total revenue from all three product lines for the pop-up week?',
+  'mixed',
+  8790,
+  20,
+  'USD',
+  'Explain which product line you would scale first and why.',
+  'Multiply each line''s units by price, then sum all line totals.',
+  '{"focus":["revenue aggregation","growth prioritization"]}'::jsonb,
+  '{"seed_group":"demo_booster"}'::jsonb
+from scenario_ref ref
+on conflict (scenario_id, question_order)
+do update
+set
+  prompt = excluded.prompt,
+  response_format = excluded.response_format,
+  numeric_answer = excluded.numeric_answer,
+  numeric_tolerance = excluded.numeric_tolerance,
+  unit = excluded.unit,
+  explanation_prompt = excluded.explanation_prompt,
+  hint = excluded.hint,
+  rubric = excluded.rubric,
+  metadata = excluded.metadata;
+
+with domain as (
+  select id
+  from public.subject_domains
+  where slug = 'business-finance'
+),
+topic as (
+  select t.id as topic_id
+  from public.tutoring_topics t
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'cash-flow'
+),
+scenario_upsert as (
+  insert into public.tutoring_scenarios (
+    topic_id,
+    slug,
+    title,
+    business_context,
+    difficulty_level,
+    display_order,
+    estimated_minutes,
+    is_active,
+    metadata
+  )
+  select
+    topic.topic_id,
+    'seasonal-pool-service-gap',
+    'Seasonal Pool Service Cash Gap',
+    'Beginning cash is $9,700. Cash inflows are $24,900 and cash outflows are $28,650 during shoulder season.',
+    'foundation',
+    4,
+    8,
+    true,
+    '{"seed_group":"demo_booster"}'::jsonb
+  from topic
+  on conflict (topic_id, slug)
+  do update
+  set
+    title = excluded.title,
+    business_context = excluded.business_context,
+    difficulty_level = excluded.difficulty_level,
+    display_order = excluded.display_order,
+    estimated_minutes = excluded.estimated_minutes,
+    is_active = excluded.is_active,
+    metadata = excluded.metadata
+  returning id
+),
+scenario_ref as (
+  select id as scenario_id from scenario_upsert
+  union all
+  select s.id
+  from public.tutoring_scenarios s
+  join public.tutoring_topics t on t.id = s.topic_id
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'cash-flow'
+    and s.slug = 'seasonal-pool-service-gap'
+  limit 1
+)
+insert into public.tutoring_scenario_skills (
+  scenario_id,
+  skill_id,
+  skill_weight
+)
+select
+  ref.scenario_id,
+  sk.id,
+  1.0
+from scenario_ref ref
+join domain d on true
+join public.tutoring_skills sk
+  on sk.subject_domain_id = d.id
+ and sk.slug in ('cash-flow-reconciliation', 'assumption-analysis')
+on conflict (scenario_id, skill_id)
+do update
+set skill_weight = excluded.skill_weight;
+
+with domain as (
+  select id
+  from public.subject_domains
+  where slug = 'business-finance'
+),
+scenario_ref as (
+  select s.id as scenario_id
+  from public.tutoring_scenarios s
+  join public.tutoring_topics t on t.id = s.topic_id
+  join domain d on d.id = t.subject_domain_id
+  where t.slug = 'cash-flow'
+    and s.slug = 'seasonal-pool-service-gap'
+  limit 1
+)
+insert into public.tutoring_scenario_questions (
+  scenario_id,
+  question_order,
+  prompt,
+  response_format,
+  numeric_answer,
+  numeric_tolerance,
+  unit,
+  explanation_prompt,
+  hint,
+  rubric,
+  metadata
+)
+select
+  ref.scenario_id,
+  1,
+  'Compute ending cash for the month.',
+  'mixed',
+  5950,
+  20,
+  'USD',
+  'What policy change could reduce cash volatility next month?',
+  'Ending cash = beginning cash + inflows - outflows.',
+  '{"focus":["cash reconciliation","cash planning"]}'::jsonb,
+  '{"seed_group":"demo_booster"}'::jsonb
+from scenario_ref ref
+on conflict (scenario_id, question_order)
+do update
+set
+  prompt = excluded.prompt,
+  response_format = excluded.response_format,
+  numeric_answer = excluded.numeric_answer,
+  numeric_tolerance = excluded.numeric_tolerance,
+  unit = excluded.unit,
+  explanation_prompt = excluded.explanation_prompt,
+  hint = excluded.hint,
+  rubric = excluded.rubric,
+  metadata = excluded.metadata;

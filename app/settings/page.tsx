@@ -12,7 +12,7 @@ export default async function SettingsPage() {
       "Configure tutoring behavior and environment-backed AI settings for mock or real provider modes.",
     children: (
       <>
-        <section className="grid gap-3 sm:grid-cols-3">
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <ProgressSummaryCard
             label="AI Provider Mode"
             value={aiStatus.mode === "mock" ? "mock" : "real"}
@@ -29,6 +29,11 @@ export default async function SettingsPage() {
             label="Mock AI Flag"
             value={aiStatus.mockEnabled ? "Enabled" : "Disabled"}
             caption="Use MOCK_AI=true for guaranteed demo behavior"
+          />
+          <ProgressSummaryCard
+            label="Configured Model"
+            value={aiStatus.configuredModel}
+            caption="Used when real mode is active"
           />
         </section>
 

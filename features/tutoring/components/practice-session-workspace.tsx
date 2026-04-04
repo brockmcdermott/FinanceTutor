@@ -35,6 +35,19 @@ function toNextStepLabel(step: FeedbackResponse["recommendedNextStep"]) {
   return "Review this concept with hints before increasing difficulty.";
 }
 
+function toStrategyLabel(strategy: FeedbackApiResponse["adaptiveRecommendation"]["strategy"]) {
+  if (strategy === "remediation") {
+    return "Remediation";
+  }
+  if (strategy === "scaffold") {
+    return "Scaffolded";
+  }
+  if (strategy === "advance") {
+    return "Advance";
+  }
+  return "Reinforce";
+}
+
 export function PracticeSessionWorkspace({
   topics,
   scenarios,
@@ -98,6 +111,18 @@ export function PracticeSessionWorkspace({
     setFeedback(null);
     setError(null);
     setSessionId(null);
+    setAdaptiveRecommendation(null);
+    setSessionSummary(null);
+  };
+
+  const handleCycleScenario = () => {
+    if (scenariosForTopic.length <= 1) {
+      return;
+    }
+
+    setScenarioIndex((current) => (current + 1) % scenariosForTopic.length);
+    setFeedback(null);
+    setError(null);
     setAdaptiveRecommendation(null);
     setSessionSummary(null);
   };
@@ -262,6 +287,20 @@ export function PracticeSessionWorkspace({
             <TopicBadge className="mt-2">Adaptive sequencing enabled</TopicBadge>
           </div>
         </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleCycleScenario}
+            className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
+          >
+            Load another scenario
+          </button>
+          {isSubmitting && (
+            <span className="rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700">
+              Evaluating your answers...
+            </span>
+          )}
+        </div>
       </section>
 
       <ScenarioCard scenario={scenario} />
@@ -273,7 +312,12 @@ export function PracticeSessionWorkspace({
         onRequestHint={handleRequestHint}
       />
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {error && (
+        <section className="rounded-2xl border border-rose-200 bg-rose-50 p-4 shadow-sm">
+          <p className="text-sm font-medium text-rose-900">Unable to complete this action</p>
+          <p className="mt-1 text-sm text-rose-800">{error}</p>
+        </section>
+      )}
 
       {feedback && (
         <>
@@ -285,6 +329,11 @@ export function PracticeSessionWorkspace({
             </p>
             {adaptiveRecommendation && (
               <>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <TopicBadge variant="intermediate">
+                    {toStrategyLabel(adaptiveRecommendation.strategy)}
+                  </TopicBadge>
+                </div>
                 <p className="mt-2 text-sm text-slate-700">{adaptiveRecommendation.reason}</p>
                 <p className="mt-1 text-sm text-slate-600">
                   Next: {adaptiveRecommendation.nextTopicTitle} - {adaptiveRecommendation.nextScenarioTitle}
@@ -306,15 +355,15 @@ export function PracticeSessionWorkspace({
             <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <h4 className="text-sm font-semibold text-slate-900">Session summary</h4>
               <p className="mt-2 text-sm font-medium text-slate-800">What you did well</p>
-              <ul className="mt-1 space-y-1 text-sm text-slate-600">
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-600">
                 {sessionSummary.whatWentWell.map((item) => (
-                  <li key={item}>- {item}</li>
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
               <p className="mt-3 text-sm font-medium text-slate-800">What to practice next</p>
-              <ul className="mt-1 space-y-1 text-sm text-slate-600">
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-600">
                 {sessionSummary.whatToPracticeNext.map((item) => (
-                  <li key={item}>- {item}</li>
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
               <p className="mt-3 text-sm text-slate-700">

@@ -41,17 +41,21 @@ export function getTutoringAiMode(): TutoringAiMode {
 export function getTutoringAiRuntimeStatus() {
   const mockEnabled = isMockAiEnabled();
   const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY?.trim());
+  const configuredModel = process.env.OPENAI_MODEL?.trim() || "gpt-4.1-mini";
+  const requestedRealMode = !mockEnabled;
   const mode = getTutoringAiMode();
 
   const fallbackReason =
-    mode === "mock" && !mockEnabled && !hasOpenAiKey
+    mode === "mock" && requestedRealMode && !hasOpenAiKey
       ? "MOCK_AI is false but OPENAI_API_KEY is missing, so the tutor falls back to mock mode."
       : null;
 
   return {
     mode,
     mockEnabled,
+    requestedRealMode,
     hasOpenAiKey,
+    configuredModel,
     fallbackReason,
   };
 }

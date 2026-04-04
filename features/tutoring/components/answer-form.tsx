@@ -153,6 +153,17 @@ export function AnswerForm({
     await onSubmit(answers);
   };
 
+  if (scenario.questions.length === 0) {
+    return (
+      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm sm:p-6">
+        <h3 className="text-lg font-semibold text-amber-900">No questions configured</h3>
+        <p className="mt-1 text-sm text-amber-800">
+          This scenario is missing questions. Select another scenario or update seed data.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}

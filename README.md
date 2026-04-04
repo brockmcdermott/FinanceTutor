@@ -20,6 +20,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-or-anon-key
 MOCK_AI=true
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4.1-mini
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_TIMEOUT_MS=15000
 ```
 
 3) Run the app in dev mode:
@@ -96,7 +98,7 @@ Seed content is in:
 The seed is idempotent and currently populates the finance domain with:
 
 - 7 topics (revenue, gross profit, net profit, fixed vs variable expenses, cash flow, ROI, cap rate)
-- 3 scenarios per topic (21 total)
+- baseline 3 scenarios per topic plus demo-booster additions (23 total scenarios)
 - scenario-question and scenario-skill mappings
 
 ### Apply migrations + seeds
@@ -126,13 +128,18 @@ npm run db:migrate:run
 
 - Default: `MOCK_AI=true` for reliable demo behavior with polished tutoring responses.
 - Real-mode attempt: set `MOCK_AI=false` and provide `OPENAI_API_KEY`.
-- Fallback behavior: if `MOCK_AI=false` but `OPENAI_API_KEY` is missing, runtime automatically falls back to mock mode.
+- Real path uses OpenAI Chat Completions with JSON-structured tutoring output and strict schema validation.
+- Fallback behavior automatically switches to mock tutoring when:
+  - key is missing
+  - OpenAI rate limits (429)
+  - API/network errors happen
+  - response payload is malformed
 - `TUTORING_AI_MODE` is still read for backward compatibility, but `MOCK_AI` is preferred.
 
 ## Notes
 
 - Ensure `.env.local` has the public keys: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-- Tutoring AI mode defaults to mock via `MOCK_AI=true`. Real mode wiring is scaffolded for future OpenAI integration.
+- Tutoring AI mode defaults to mock via `MOCK_AI=true`. Real mode is production-safe with fallback to mock on failure.
 - For protected pages/components, see patterns in `lib/auth.ts` and `lib/supabase/*`.
 - If you use local containers, make sure Docker is running.
 
@@ -144,3 +151,9 @@ npm run db:migrate:run
 - `/review` - Review and results
 - `/progress` - Learner progress tracking
 - `/settings` - Tutoring and AI settings
+
+## Documentation
+
+- `Docs/HLD.md` - high-level architecture
+- `Docs/LLD.md` - implementation-level architecture and service flow
+- `Docs/how-to-demo.md` - class demo walkthrough and talking points
