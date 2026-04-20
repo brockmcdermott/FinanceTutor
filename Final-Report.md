@@ -125,7 +125,7 @@ The codebase also shows that the prototype is not just a front-end mockup. The p
 
 **Figure 1. Home Dashboard of Finance Teacher**
 
-[Insert dashboard screenshot here]
+![Figure 1. Home Dashboard of Finance Teacher.](Docs/Pictures/image1.png)
 
 The Home Dashboard is the starting point of the system. It gives the learner a quick view of the tutoring environment by showing the main navigation, a large “continue learning” panel, the number of topics available, the current practice mode, recent activity, a topic overview, and a progress snapshot. In the screenshot, the dashboard shows that seven topics are available and that the tutor is operating in real mode with a configured model. It also highlights a weak skill signal and recommends a next practice focus.
 
@@ -135,7 +135,7 @@ This page is important because it communicates that Finance Teacher is not just 
 
 **Figure 2. Topics page showing the available finance modules**
 
-[Insert topics screenshot here]
+![Figure 2. Topics page showing the available finance modules.](Docs/Pictures/image2.png)
 
 The Topics page shows the content structure of the prototype. In the current version, I built seven finance topics: Revenue, Gross Profit, Net Profit, Fixed vs. Variable Expenses, Cash Flow, ROI, and Cap Rate. Each topic card includes a short description of the concept, the number of scenarios configured for that topic, and a button to start practice. This design helps move the system away from isolated formula drills and toward a broader instructional structure.
 
@@ -145,7 +145,7 @@ One detail I intentionally built into this page is that the topics are described
 
 **Figure 3. Practice session screen before submission**
 
-[Insert practice-session screenshot here]
+![Figure 3. Practice session screen before submission.](Docs/Pictures/image3.png)
 
 The Practice Session page is the core instructional screen in the prototype. The current screenshot shows a revenue scenario called **Coffee Shop Morning Rush**. The learner is given a short business context, the relevant topic tags, the estimated time, and a question prompt. They then enter a numeric answer and a short written explanation. The interface also includes a “Get hint” button and a submit button.
 
@@ -165,7 +165,7 @@ The feedback route also persists learner data. After evaluating the attempt, the
 
 **Figure 4. Feedback for a weak or incomplete answer**
 
-[Insert low-score feedback screenshot here]
+![Figure 4. Feedback for a weak or incomplete answer.](Docs/Pictures/image4.png)
 
 This screenshot shows what happens when the learner gives a weak response. In this example, the score is 5%. The tutor feedback explains that the learner responded to the question but did not provide the required numeric calculation or explanation. It tags the attempt with issues such as formula selection error, limited reasoning depth, and weak concept language. The screen then separates the response into “What went well” and “Where to improve,” gives follow-up guidance, and provides a specific hint about how to calculate revenue from drinks and pastries separately before combining them.
 
@@ -175,7 +175,7 @@ This is one of the strongest pieces of the prototype because it shows the tutor 
 
 **Figure 5. Feedback for a stronger answer with reasoning improvement suggestions**
 
-[Insert higher-score feedback screenshot here]
+![Figure 5. Feedback for a stronger answer with reasoning improvement suggestions.](Docs/Pictures/image5.png)
 
 This second feedback screenshot shows the same basic tutoring structure on a stronger response. Here the score is 82%. The learner correctly calculated the total monthly revenue, so the system recognizes what was done well. At the same time, it still points out that the explanation could be clearer and more precise. The feedback asks for a more complete step-by-step explanation, recommends better terminology, and suggests explicitly stating the final total revenue amount.
 
@@ -185,7 +185,7 @@ This example is useful because it shows that the tutor is not binary. It does no
 
 **Figure 6. Review / Results page with recent submissions and reflection prompt**
 
-[Insert review-results screenshot here]
+![Figure 6. Review / Results page with recent submissions and reflection prompt.](Docs/Pictures/image6.png)
 
 The Review / Results page lets the learner look back across recent attempts. It shows the latest result, recent submission scores, and a reflection prompt that asks the learner to choose a lower-scoring scenario and rewrite their explanation. In the screenshot, the page displays a recent set of revenue attempts with varying scores and suggests repeating a scenario after identifying a misconception that still needs work.
 
@@ -195,7 +195,7 @@ This page matters because it turns the tutor into more than a one-question-at-a-
 
 **Figure 7. Progress page showing topic mastery and weak areas**
 
-[Insert progress screenshot here]
+![Figure 7. Progress page showing topic mastery and weak areas.](Docs/Pictures/image7.png)
 
 The Progress page gives a broader view of learner development across topics. It shows total attempts, average score, improving topics, topic mastery cards, and weak areas to review. Even though the current screenshot reflects early seeded data, the structure of the page is important. The prototype is designed to track mastery by topic and skill over time rather than only storing isolated scores.
 
@@ -205,7 +205,7 @@ This screen reflects the learner model direction of the project. The tutor is me
 
 **Figure 8. Settings page showing AI mode and tutoring preferences**
 
-[Insert settings screenshot here if you have room]
+![Figure 8. Settings page showing AI mode and tutoring preferences.](Docs/Pictures/image8.png)
 
 The Settings page is not the most important learning screen, but it is useful evidence for how the prototype is actually wired. It shows that the system distinguishes between mock and real AI modes, checks whether an OpenAI key is present, displays the configured model, and includes interface scaffolding for response style and difficulty ramp. The README also makes clear that the app supports mock mode for stable demos and real mode with fallback behavior if API problems occur.
 
