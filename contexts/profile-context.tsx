@@ -37,25 +37,65 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (!user?.id) {
       setProfile(null);
       setLoading(false);
       setError(null);
-      return;
+      return () => {
+        isMounted = false;
+      };
     }
+
     setLoading(true);
     setError(null);
-    const supabase = createClient();
-    supabase
-      .from("profiles")
-      .select("profile_picture_url, first_name, last_name, created_at")
-      .eq("user_id", user.id)
-      .single()
-      .then(({ data, error: fetchError }) => {
-        setProfile(data ?? null);
-        setError(fetchError?.message ?? null);
+
+    try {
+      const supabase = createClient();
+
+      (async () => {
+        try {
+          const { data, error: fetchError } = await supabase
+            .from("profiles")
+            .select("profile_picture_url, first_name, last_name, created_at")
+            .eq("user_id", user.id)
+            .single();
+
+          if (!isMounted) {
+            return;
+          }
+          setProfile(data ?? null);
+          setError(fetchError?.message ?? null);
+          setLoading(false);
+        } catch (fetchError: unknown) {
+          if (!isMounted) {
+            return;
+          }
+          setProfile(null);
+          setError(
+            fetchError instanceof Error
+              ? fetchError.message
+              : "Unable to load profile."
+          );
+          setLoading(false);
+        }
+      })();
+    } catch (clientError: unknown) {
+      if (isMounted) {
+        setProfile(null);
+        setError(
+          clientError instanceof Error
+            ? clientError.message
+            : "Unable to initialize profile loading."
+        );
         setLoading(false);
-      });
+      }
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user?.id]);
 
   const value: ProfileContextValue = {

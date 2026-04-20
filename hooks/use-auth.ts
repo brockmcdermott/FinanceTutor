@@ -25,23 +25,53 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = createClient();
+    let isMounted = true;
+    let unsubscribe: (() => void) | null = null;
 
-    // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      setLoading(false);
-    });
+    try {
+      const supabase = createClient();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      // Get initial session
+      supabase.auth
+        .getUser()
+        .then(({ data: { user } }) => {
+          if (!isMounted) {
+            return;
+          }
+          setUser(user);
+          setLoading(false);
+        })
+        .catch(() => {
+          if (!isMounted) {
+            return;
+          }
+          setUser(null);
+          setLoading(false);
+        });
 
-    return () => subscription.unsubscribe();
+      // Listen for auth changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!isMounted) {
+          return;
+        }
+        setUser(session?.user ?? null);
+        setLoading(false);
+      });
+
+      unsubscribe = () => subscription.unsubscribe();
+    } catch {
+      if (isMounted) {
+        setUser(null);
+        setLoading(false);
+      }
+    }
+
+    return () => {
+      isMounted = false;
+      unsubscribe?.();
+    };
   }, []);
 
   return { user, loading };
