@@ -2,17 +2,23 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FormField, FormError, FormSubmitButton } from "@/components/form";
 import { useLogin } from "@/hooks/use-login";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const searchParams = useSearchParams();
   const { login, isLoading, error } = useLogin();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login({ email, password });
+    await login({
+      email,
+      password,
+      redirectTo: searchParams.get("next"),
+    });
   };
 
   return (

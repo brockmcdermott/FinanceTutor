@@ -1,9 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { useLogin } from "@/hooks/use-login";
 
-const mockPush = jest.fn();
+const mockReplace = jest.fn();
+const mockRefresh = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ replace: mockReplace, refresh: mockRefresh }),
 }));
 
 const mockSignInWithPassword = jest.fn();
@@ -20,7 +21,7 @@ describe("useLogin", () => {
     jest.clearAllMocks();
   });
 
-  it("calls signInWithPassword and router.push on success", async () => {
+  it("calls signInWithPassword and navigates to dashboard by default on success", async () => {
     mockSignInWithPassword.mockResolvedValue({ error: null });
     const { result } = renderHook(() => useLogin());
 
@@ -35,8 +36,39 @@ describe("useLogin", () => {
       email: "user@example.com",
       password: "password123",
     });
-    expect(mockPush).toHaveBeenCalledWith("/dashboard");
+    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
+    expect(mockRefresh).toHaveBeenCalled();
     expect(result.current.error).toBeNull();
+  });
+
+  it("navigates to a safe redirect destination when provided", async () => {
+    mockSignInWithPassword.mockResolvedValue({ error: null });
+    const { result } = renderHook(() => useLogin());
+
+    await act(async () => {
+      await result.current.login({
+        email: "user@example.com",
+        password: "password123",
+        redirectTo: "/practice?topic=inventory-turnover",
+      });
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith("/practice?topic=inventory-turnover");
+  });
+
+  it("falls back to dashboard for an unsafe redirect destination", async () => {
+    mockSignInWithPassword.mockResolvedValue({ error: null });
+    const { result } = renderHook(() => useLogin());
+
+    await act(async () => {
+      await result.current.login({
+        email: "user@example.com",
+        password: "password123",
+        redirectTo: "https://malicious.example",
+      });
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
   });
 
   it("sets error on signIn failure", async () => {
@@ -53,6 +85,6 @@ describe("useLogin", () => {
     });
 
     expect(result.current.error).toBe("An error occurred");
-    expect(mockPush).not.toHaveBeenCalled();
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 });

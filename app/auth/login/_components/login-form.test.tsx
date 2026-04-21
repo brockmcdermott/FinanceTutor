@@ -10,6 +10,10 @@ jest.mock("@/hooks/use-login", () => ({
   }),
 }));
 
+jest.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(""),
+}));
+
 describe("LoginForm", () => {
   beforeEach(() => {
     mockLogin.mockClear();
@@ -46,6 +50,7 @@ describe("LoginForm", () => {
     expect(mockLogin).toHaveBeenCalledWith({
       email: "user@example.com",
       password: "password123",
+      redirectTo: null,
     });
   });
 });

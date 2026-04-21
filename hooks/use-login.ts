@@ -7,7 +7,21 @@ import { createClient } from "@/lib/supabase/client";
 export type LoginParams = {
   email: string;
   password: string;
+  redirectTo?: string | null;
 };
+
+function resolvePostLoginPath(redirectTo?: string | null) {
+  if (!redirectTo) {
+    return "/dashboard";
+  }
+
+  // Prevent open redirects while allowing in-app paths and query strings.
+  if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return redirectTo;
+}
 
 export function useLogin() {
   const router = useRouter();
@@ -15,7 +29,7 @@ export function useLogin() {
   const [error, setError] = useState<string | null>(null);
 
   async function login(params: LoginParams) {
-    const { email, password } = params;
+    const { email, password, redirectTo } = params;
 
     setIsLoading(true);
     setError(null);
@@ -27,7 +41,8 @@ export function useLogin() {
         password,
       });
       if (signInError) throw signInError;
-      router.push("/dashboard");
+      router.replace(resolvePostLoginPath(redirectTo));
+      router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

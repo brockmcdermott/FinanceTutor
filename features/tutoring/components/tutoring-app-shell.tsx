@@ -37,21 +37,24 @@ export function TutoringAppShell({
             </div>
           </div>
 
-          <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-            {tutoringNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition",
-                  isActiveRoute(currentPath, item.href)
-                    ? "bg-slate-900 text-white"
-                    : "bg-white text-slate-700 hover:bg-slate-100"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="mt-4 lg:hidden" aria-label="Tutoring navigation">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              {tutoringNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex min-h-11 items-center justify-center rounded-2xl px-3 py-2 text-center text-sm font-semibold leading-tight transition",
+                    "sm:min-h-0 sm:whitespace-nowrap sm:rounded-full sm:px-4 sm:py-1.5",
+                    isActiveRoute(currentPath, item.href)
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-slate-700 hover:bg-slate-100"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </nav>
         </div>
 
